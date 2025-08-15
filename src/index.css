@@ -1,13 +1,107 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ----- Buttons (fix invisible hover) ----- */
+.gw-btn {
+  appearance: none;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .15s ease, background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.gw-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(2,6,23,.08);
+  background: #f8fafc;
+}
+.gw-btn:active:not(:disabled) { transform: translateY(0); }
+.gw-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+.gw-btn-dark {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+.gw-btn-dark:hover:not(:disabled) {
+  background: #111827;  /* stays visible on hover */
+  border-color: #111827;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ----- Spinner inside buttons ----- */
+.gw-spinner {
+  display: inline-block;
+  width: 1em; height: 1em;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: -2px;
+  animation: gw-spin 0.8s linear infinite;
 }
+@keyframes gw-spin { to { transform: rotate(360deg); } }
+
+/* ----- Card & layout ----- */
+.gw-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin: 14px 0; }
+.gw-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gw-card-title { margin: 0; font-size: 16px; }
+.gw-field-row { margin-top: 10px; }
+.gw-input {
+  width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px;
+  outline: none; transition: box-shadow .15s ease, border-color .15s ease;
+}
+.gw-input:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+
+.gw-subtle { color: #64748b; font-size: 13px; }
+.gw-error { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 10px; }
+
+/* ----- Progress bar (nicer) ----- */
+.gw-progress-wrap {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f1f5f9, #e2e8f0);
+  overflow: hidden;
+  margin-top: 8px;
+}
+.gw-progress {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+  box-shadow: inset 0 0 1px rgba(255,255,255,.5);
+  transition: width .4s ease;
+}
+.gw-progress-wrap::after {
+  /* subtle moving sheen */
+  content: "";
+  position: absolute; top: 0; bottom: 0; left: -40%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  animation: gw-sheen 1.6s ease-in-out infinite;
+}
+@keyframes gw-sheen { from { left: -40%; } to { left: 100%; } }
+
+/* ----- List ----- */
+.gw-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.gw-list-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
+.gw-list-item:last-child { border-bottom: 0; }
+.gw-btn.danger { background: #fee2e2; border-color: #fecaca; color: #7f1d1d; }
+.gw-btn.danger:hover { background: #fecaca; }
+
+/* ----- Toaster (top-right stack) ----- */
+.gw-toaster {
+  position: fixed; top: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+}
+.gw-toast {
+  min-width: 240px; max-width: 360px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+  padding: 10px 12px; box-shadow: 0 10px 30px rgba(2,6,23,.1);
+  cursor: pointer; transition: transform .08s ease, box-shadow .15s ease;
+}
+.gw-toast:hover { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(2,6,23,.12); }
+.gw-toast-title { font-weight: 700; margin-bottom: 2px; }
+.gw-toast-msg { color: #334155; }
+.gw-toast-success { border-color: #bbf7d0; background: #ecfdf5; }
+.gw-toast-info    { border-color: #bfdbfe; background: #eff6ff; }
+.gw-toast-error   { border-color: #fecaca; background: #fef2f2; }
