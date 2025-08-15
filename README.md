@@ -1,3 +1,6 @@
+"**Problem**: React wizard needs to communicate with backend services. **Tasks**: Wire wizard to create/import endpoints; Add status polling for async operations; Implement real-time progress updates; Add error state handling; Create loading indicators; Add success confirmation screens. **Acceptance Criteria**: Wizard calls backend APIs successfully; Real-time status updates displayed; Error states handled gracefully; User feedback on completion."
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
