@@ -1,73 +1,248 @@
 "**Problem**: React wizard needs to communicate with backend services. **Tasks**: Wire wizard to create/import endpoints; Add status polling for async operations; Implement real-time progress updates; Add error state handling; Create loading indicators; Add success confirmation screens. **Acceptance Criteria**: Wizard calls backend APIs successfully; Real-time status updates displayed; Error states handled gracefully; User feedback on completion."
 
 
-# Getting Started with Create React App
+Game Wizard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Create/import games, poll backend status in real time, show progress and success, and handle errors gracefully. Built for a clean demo and easy hand-off to a real backend.
 
-## Available Scripts
+✨ What you get
 
-In the project directory, you can run:
+Create & Import flows wired to backend endpoints
 
-### `npm start`
+Polling for async job status with exponential backoff and timeout
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Smooth progress bar & loading indicators
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Clear error states and success confirmations (toasts)
 
-### `npm test`
+A simple list view with refresh and delete
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+✅ Acceptance Criteria (mapped)
 
-### `npm run build`
+Wizard calls backend APIs successfully → apiService.js + .env base URL
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Real-time status updates displayed → usePoll hook + progress bar
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Error states handled gracefully → guarded UI states + error banners + retry/cancel
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+User feedback on completion → toast notifications + success stripe
 
-### `npm run eject`
+1) Tech stack
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+React 18 (Create React App or Vite – CRA assumed below)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Axios for HTTP
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Custom usePoll hook for polling (with backoff, jitter, timeout)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Lightweight toast provider (no external dependency)
 
-## Learn More
+2) Project structure
+game-wizard/
+  ├─ public/
+  ├─ src/
+  │  ├─ components/
+  │  │  ├─ CreatePanel.jsx
+  │  │  ├─ ImportPanel.jsx
+  │  │  ├─ ListPanel.jsx
+  │  │  └─ ToastProvider.jsx
+  │  ├─ hooks/
+  │  │  └─ usePoll.js
+  │  ├─ services/
+  │  │  └─ apiService.js
+  │  ├─ analytics/               (optional demo)
+  │  │  └─ client.js
+  │  ├─ App.js
+  │  ├─ App.css
+  │  └─ index.js
+  ├─ .env                        ← frontend env vars
+  ├─ package.json
+  └─ README.md
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3) Getting started
+Prereqs
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Node 18+ and npm
 
-### Code Splitting
+A backend endpoint. For demos we use MockAPI (free). You can switch to a real API with one env var.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3.1 Clone & install
+git clone <your-repo-url> game-wizard
+cd game-wizard
+npm install
 
-### Analyzing the Bundle Size
+3.2 Configure the API base URL
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Create a .env in the project root:
 
-### Making a Progressive Web App
+# For MockAPI (example):
+REACT_APP_API_BASE=https://689b95b558a27b18087bb9c4.mockapi.io/games/games
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Optional (only if you also run the tiny analytics demo):
+# REACT_APP_ANALYTICS_BASE=http://localhost:4000
 
-### Advanced Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Note: Restart npm start whenever you change .env.
 
-### Deployment
+3.3 Start the app
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `npm run build` fails to minify
+The app runs at http://localhost:3000.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+4) How to use (demo flow)
+
+Create
+
+Enter a name → click Create
+
+The app creates a record with status: 'queued', progress: 0 and polls until completed (or progress:100).
+
+You’ll see progress bar, status label, Cancel/Retry if needed, and a success toast.
+
+Import
+
+Choose a small JSON file (optional: { "name": "my-game" }).
+
+Click Import → a new queued item is created and progressed.
+
+All Games
+
+Click Refresh to fetch latest.
+
+Delete removes an item.
+
+Everything logs helpful messages in DevTools (Network + Console) for debugging.
+
+5) Configuration details
+5.1 API contract expected by the UI
+
+Create: POST /
+Body: { name, status:'queued', progress:0 }
+Returns: { id, ... }
+
+Import: (same as create for the mock) POST /
+Returns: { id, ... }
+
+Get status (poll): GET /:id
+Returns: { id, name, status: 'queued'|'processing'|'completed'|'failed', progress: 0..100 }
+
+List: GET / → [ { id, name, status, progress }, ... ]
+
+Update (used by demo simulator): PUT /:id
+
+Delete: DELETE /:id
+
+The MockAPI route path must match the resource you created (e.g., /games/games).
+If your MockAPI path is different, set it in REACT_APP_API_BASE.
+
+5.2 Switch to a real backend later
+
+Change .env:
+
+REACT_APP_API_BASE=http://localhost:8080/api/games
+
+
+Ensure your backend implements the endpoints above (or adjust apiService.js accordingly).
+
+Restart npm start.
+
+6) Key files (what they do)
+src/services/apiService.js
+
+Wraps Axios with base URL and a light request throttle (reduces 429s on free tiers)
+
+Exposes: createGame, importGame, getGame, updateGame, listGames, deleteGame
+
+Includes a small simulateServerWork(id) helper (demo only) that increments progress server-side by calling PUT /:id
+
+src/hooks/usePoll.js
+
+Generic polling hook with:
+
+Exponential backoff on 429/503
+
+Retry-After header support
+
+Jitter to avoid bursts
+
+Timeout and stopWhen guard
+
+Abortable requests (passes an AbortSignal to your fn)
+
+src/components/CreatePanel.jsx
+
+Form to create a job
+
+Starts polling when a new ID returns
+
+Shows progress bar & status
+
+Error → banner + Retry/Cancel
+
+Success → toast + auto-reset + calls onDone() (to refresh list)
+
+src/components/ImportPanel.jsx
+
+Reads a file, creates a queued job, and starts demo progress via simulateServerWork()
+
+Success → toast + onDone()
+
+src/components/ListPanel.jsx
+
+Displays all games with meta (status, progress)
+
+Refresh & Delete
+
+src/components/ToastProvider.jsx
+
+Tiny toast system (useToast().push("message", "success|error|info"))
+
+Auto-dismiss with click to dismiss
+
+7) Styling
+
+Minimal CSS in App.css using utility classes:
+
+.gw-card, .gw-btn, .gw-btn-dark, .gw-btn-danger
+
+.gw-progress-wrap, .gw-progress
+
+.gw-toast, .gw-toast-success, .gw-toast-error
+
+Dark & light themes are easy to toggle by changing root colors.
+
+8) Optional: Analytics demo (5 min)
+
+You can optionally track page views, button clicks, and completions into a tiny Express + MongoDB server with a one-page dashboard.
+Steps are in analytics-server/README (or ask your teammate who ran it). TL;DR: start analytics-server (port 4000), set REACT_APP_ANALYTICS_BASE, and the app will POST events to /events.
+
+9) Troubleshooting
+
+429 / “Too Many Requests” / “net::ERR_INSUFFICIENT_RESOURCES”
+
+The Axios client is throttled; if you still see this, refresh less, or increase MIN_GAP in apiService.js.
+
+404 (MockAPI)
+
+Double-check the resource path in your MockAPI URL matches .env REACT_APP_API_BASE.
+
+Polling doesn’t stop
+
+Ensure your backend returns status: 'completed' or progress: 100.
+
+Environment changes don’t apply
+
+Restart npm start after editing .env.
+
+10) Demo script (5 minutes)
+
+Landing → “Create/import → poll status → success” shown at top.
+
+Create → enter a name, click Create → progress updates in real time → toast shows success → list refreshes.
+
+Import → pick a small JSON → click Import → same progress path (simulated) → success toast.
+
+List → click Refresh, then Delete an item → toast “Deleted”.
+
+(Optional) Open DevTools → Network → show API calls & polling intervals.
